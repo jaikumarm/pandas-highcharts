@@ -99,7 +99,7 @@ def serialize(df, output_type="javascript", chart_type="default", *args, **kwarg
         if kwargs.get("kind") == "candlestick":
 
             d = {
-                "name": "OHCLV",
+                "name": str(kwargs["title"]) if "title" in kwargs else "OHCLV",
                 "yAxis": int(0),
                 "data": list(df.to_dict('records')),
                 "type": 'candlestick'
