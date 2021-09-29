@@ -9,7 +9,8 @@ _pd2hc_kind = {
     "barh": "bar",
     "area": "area",
     "line": "line",
-    "pie": "pie"
+    "pie": "pie",
+    "candlestick":"candlestick",
 }
 
 
