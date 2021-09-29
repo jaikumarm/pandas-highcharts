@@ -10,7 +10,7 @@ _pd2hc_kind = {
     "area": "area",
     "line": "line",
     "pie": "pie",
-    "candlestick":"candlestick",
+    "candlestick": "candlestick",
 }
 
 
@@ -95,22 +95,42 @@ def serialize(df, output_type="javascript", chart_type="default", *args, **kwarg
             df = df.sort_index()
         series = df.to_dict('series')
         output["series"] = []
-        for name, data in series.items():
-            if df[name].dtype.kind in "biufc":
-                sec = is_secondary(name, **kwargs)
-                d = {
-                    "name": name if not sec or not kwargs.get("mark_right", True) else name + " (right)",
-                    "yAxis": int(sec),
-                    "data": list(zip(df.index, data.values.tolist()))
-                }
-                if kwargs.get('polar'):
-                    d['data'] = [v for k, v in d['data']]
-                if kwargs.get("kind") == "area" and kwargs.get("stacked", True):
-                    d["stacking"] = 'normal'
-                if kwargs.get("style"):
-                    d["dashStyle"] = pd2hc_linestyle(kwargs["style"].get(name, "-"))
-                output["series"].append(d)
-        output['series'].sort(key=lambda s: s['name'])
+
+        if kwargs.get("kind") == "candlestick":
+
+            d = {
+                "name": "OHCLV",
+                "yAxis": int(0),
+                "data": list(df.to_dict('records')),
+                "type": 'candlestick'
+            }
+            if kwargs.get('polar'):
+                d['data'] = [v for k, v in d['data']]
+            if kwargs.get("kind") == "area" and kwargs.get("stacked", True):
+                d["stacking"] = 'normal'
+            if kwargs.get("style"):
+                d["dashStyle"] = pd2hc_linestyle(kwargs["style"].get(name, "-"))
+            output["series"].append(d)
+            output['series'].sort(key=lambda s: s['name'])
+
+        else:
+
+            for name, data in series.items():
+                if df[name].dtype.kind in "biufc":
+                    sec = is_secondary(name, **kwargs)
+                    d = {
+                        "name": name if not sec or not kwargs.get("mark_right", True) else name + " (right)",
+                        "yAxis": int(sec),
+                        "data": list(zip(df.index, data.values.tolist()))
+                    }
+                    if kwargs.get('polar'):
+                        d['data'] = [v for k, v in d['data']]
+                    if kwargs.get("kind") == "area" and kwargs.get("stacked", True):
+                        d["stacking"] = 'normal'
+                    if kwargs.get("style"):
+                        d["dashStyle"] = pd2hc_linestyle(kwargs["style"].get(name, "-"))
+                    output["series"].append(d)
+            output['series'].sort(key=lambda s: s['name'])
 
     def serialize_subtitle(df, output, *args, **kwargs):
         pass
